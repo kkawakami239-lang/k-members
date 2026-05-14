@@ -680,8 +680,8 @@ var FILES = {
       desc: '入会ガイド・コース案内・各種規約などの資料です。',
       files: [
         { name: '入会ガイドブック',    desc: '入会時の説明資料',                       date: '2026-02-19', path: 'pdf/hogo/nyukai-guide.pdf',    download: true },
-        { name: '中学生コース案内',    desc: '中学生コース・理社演習回・テスト対策・受験特訓', date: '2025-11-04', path: 'pdf/hogo/chugaku-course.pdf', download: true },
-        { name: '受験特訓コース案内',  desc: '受験特訓コースの詳細',                     date: '2026-04-24', path: 'pdf/hogo/jyuken-tokkun.pdf',  download: true },
+        { name: '中学生コース案内',    desc: '準備中', date: '2025-11-04', path: '', download: false, disabled: true },
+        { name: '受験特訓コース案内',  desc: '準備中', date: '2026-04-24', path: '', download: false, disabled: true },
       ]
     },
   ],
@@ -689,10 +689,12 @@ var FILES = {
   // ---- 生徒向け ----
   seito: [
     {
-      category: '勉強に関すること',
-      desc: '家庭学習の進め方・勉強法・プリントなどの資料です。',
+      category: '英語｜NEW HORIZON 教科書和訳',
+      desc: 'NEW HORIZONの教科書和訳です。予習・復習に活用してください。',
       files: [
-        // { name: '家庭学習ガイド', desc: '', date: '2026-05-01', path: 'pdf/seito/study-guide.pdf', download: true },
+        { name: 'NEW HORIZON 中1 和訳', desc: 'NEW HORIZON English Course 1', date: '2026-05-15', path: 'pdf/seito/english-nh-grade1.pdf', download: true },
+        { name: 'NEW HORIZON 中2 和訳', desc: 'NEW HORIZON English Course 2', date: '2026-05-15', path: 'pdf/seito/english-nh-grade2.pdf', download: true },
+        { name: 'NEW HORIZON 中3 和訳', desc: 'NEW HORIZON English Course 3', date: '2026-05-15', path: 'pdf/seito/english-nh-grade3.pdf', download: true },
       ]
     },
   ]
@@ -725,7 +727,9 @@ function renderTab(key, containerId) {
         html += '<div class="file-date">更新日：' + esc(f.date) + '</div>';
         html += '</div>';
         html += '<div class="file-actions">';
-        if (f.download) {
+        if (f.disabled) {
+          html += '<button class="btn-open" disabled style="background:#ccc;cursor:not-allowed;">準備中</button>';
+        } else if (f.download) {
           html += '<button class="btn-open" onclick="openPdf(\'' + f.path + '\', true, \'' + esc(f.name) + '\')">開く</button>';
           html += '<a class="btn-dl" href="' + f.path + '" download>保存</a>';
         } else {
