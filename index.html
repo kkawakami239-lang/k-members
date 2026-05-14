@@ -300,6 +300,102 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Meiryo'
   min-height: 44px;
 }
 #pdfFrame { flex: 1; border: none; width: 100%; }
+
+/* ========== 時間割表 ========== */
+/* アコーディオン */
+.accordion-btn {
+  width: 100%; text-align: left;
+  background: #f4f6fa; border: 2px solid #c8d4e4;
+  border-radius: 10px; padding: 14px 18px;
+  font-size: 15px; font-weight: bold; color: #1a3a5c;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 12px;
+  transition: background 0.2s;
+}
+.accordion-btn:hover { background: #e8eef7; }
+.accordion-btn .acc-arrow { font-size: 12px; transition: transform 0.25s; }
+.accordion-btn.open .acc-arrow { transform: rotate(180deg); }
+.accordion-body { display: none; margin-bottom: 8px; }
+.accordion-body.open { display: block; }
+
+.tt-wrap { margin-bottom: 36px; }
+.tt-title {
+  font-size: 16px; font-weight: bold; color: white;
+  background: #1a3a5c; padding: 12px 18px;
+  border-radius: 10px 10px 0 0;
+}
+.tt-outer {
+  border: 2px solid #1a3a5c; border-top: none;
+  border-radius: 0 0 10px 10px; background: white;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.tt-grid {
+  display: grid;
+  grid-template-columns: 48px repeat(6, 1fr);
+  min-width: 520px;
+  position: relative;
+}
+.hd-day {
+  background: #2d4a6e; color: white; font-weight: bold;
+  font-size: 14px; text-align: center; padding: 10px 4px;
+  border-right: 1px solid #3d5a7e;
+}
+.hd-day:first-child { background: #1a3a5c; }
+.time-label {
+  grid-column: 1;
+  background: #eef2f7;
+  border-top: 1px solid #d0d0d0;
+  border-right: 2px solid #b0bccf;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 6px;
+  font-size: 13px; font-weight: bold; color: #1a3a5c;
+  height: 120px;
+}
+.day-lane {
+  border-top: 1px solid #e8e8e8;
+  border-right: 1px solid #e8e8e8;
+  height: 120px;
+  position: relative;
+  z-index: 0;
+}
+.day-lane::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  border-top: 1px dashed #e0e0e0;
+  z-index: 0;
+}
+.slot {
+  position: absolute;
+  left: 3px; right: 3px;
+  border-radius: 8px;
+  padding: 8px;
+  line-height: 1.5;
+  font-size: 12px;
+  display: flex; flex-direction: column; justify-content: center;
+  overflow: hidden;
+  z-index: 10;
+}
+.slot-time  { font-size: 12px; font-weight: bold; display: block; }
+.slot-dur   { font-size: 11px; display: block; opacity: 0.75; margin-bottom: 2px; }
+.slot-grade { font-size: 12px; font-weight: bold; display: block; }
+.slot-name  { font-size: 12px; font-weight: bold; display: block; }
+.s-juku  { background: #fffbf0; border: 2px solid #c49a1a; color: #6b4f00; }
+.s-sho   { background: #fff7ed; border: 2px solid #f97316; color: #7c2d12; }
+.s-mix   { background: #f0f9ff; border: 2px solid #0284c7; color: #0c4a6e; }
+.s-chu   { background: #fffbf0; border: 2px solid #c49a1a; color: #6b4f00; }
+.s-ens   { background: #f0fdf4; border: 2px solid #16a34a; color: #14532d; }
+.s-eiken { background: #fff0f2; border: 2px solid #e11d48; color: #9f0f33; }
+.s-tokku { background: #f3f0ff; border: 2px solid #7c3aed; color: #5b21b6; }
+.s-ca    { background: #eff6ff; border: 2px solid #2563eb; color: #1e40af; }
+.tt-note {
+  font-size: 12px; color: #666; margin-top: 10px;
+  padding: 10px 14px; background: #fffbf0;
+  border-left: 4px solid #c49a1a; border-radius: 4px;
+}
+.legend-wrap { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.legend-color { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -337,42 +433,81 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Meiryo'
 
   <div class="tab-bar">
     <div class="tab-inner">
-      <button class="tab-btn active" id="tabBtnKyotsuu" onclick="switchTab('kyotsuu')">📌 共通</button>
-      <button class="tab-btn" id="tabBtnJuku" onclick="switchTab('juku')">🏫 学習塾</button>
-      <button class="tab-btn" id="tabBtnCa" onclick="switchTab('ca')">
-        <span class="tab-label-pc">💻 コードアドベンチャー</span>
-        <span class="tab-label-sp">💻 CA（プログラミング）</span>
-      </button>
+      <button class="tab-btn active" id="tabBtnHogo" onclick="switchTab('hogo')">👨‍👩‍👧 保護者向け</button>
+      <button class="tab-btn" id="tabBtnSeito" onclick="switchTab('seito')">📖 生徒向け</button>
     </div>
   </div>
 
   <div class="content-wrap">
 
-    <!-- 共通タブ -->
-    <div class="tab-panel active" id="panelKyotsuu">
+    <!-- 保護者向けタブ -->
+    <div class="tab-panel active" id="panelHogo">
       <div class="notice-box">
-        塾・コードアドベンチャー共通のご案内を掲載しています。<br>
+        規約・コース案内など保護者向けの資料を掲載しています。<br>
         ご不明な点は公式LINEよりお問い合わせください。
       </div>
-      <div id="fileListKyotsuu"></div>
+
+      <!-- 時間割（学習塾） -->
+      <div class="legend-wrap">
+        <div class="legend-item"><div class="legend-color" style="background:#fff7ed;border:2px solid #f97316;"></div>小2〜4年生</div>
+        <div class="legend-item"><div class="legend-color" style="background:#f0f9ff;border:2px solid #0284c7;"></div>小5,6年生・中学生</div>
+        <div class="legend-item"><div class="legend-color" style="background:#fffbf0;border:2px solid #c49a1a;"></div>中学生</div>
+        <div class="legend-item"><div class="legend-color" style="background:#f0fdf4;border:2px solid #16a34a;"></div>土曜演習回</div>
+        <div class="legend-item"><div class="legend-color" style="background:#fff0f2;border:2px solid #e11d48;"></div>英検対策講座</div>
+        <div class="legend-item"><div class="legend-color" style="background:#f3f0ff;border:2px solid #7c3aed;"></div>受験特訓講座</div>
+      </div>
+      <button class="accordion-btn" onclick="toggleAcc(this, 'juku-kita')">
+        🏫 クロフネ　北久里浜校　時間割 <span class="acc-arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="tt-wrap">
+          <div class="tt-outer"><div class="tt-grid" id="juku-kita"></div></div>
+          <div class="tt-note">※授業の最後5分は家庭学習の整理や片付けの時間となります。</div>
+        </div>
+      </div>
+      <button class="accordion-btn" onclick="toggleAcc(this, 'juku-keikyu')">
+        🏫 クロフネ　京急久里浜校　時間割 <span class="acc-arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="tt-wrap">
+          <div class="tt-outer"><div class="tt-grid" id="juku-keikyu"></div></div>
+          <div class="tt-note">※授業の最後5分は家庭学習の整理や片付けの時間となります。</div>
+        </div>
+      </div>
+
+      <!-- 時間割（CA） -->
+      <div class="legend-wrap" style="margin-top:8px;">
+        <div class="legend-item"><div class="legend-color" style="background:#eff6ff;border:2px solid #2563eb;"></div>コードアドベンチャー</div>
+      </div>
+      <button class="accordion-btn" onclick="toggleAcc(this, 'ca-kita')">
+        💻 コードアドベンチャー　北久里浜校　時間割 <span class="acc-arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="tt-wrap">
+          <div class="tt-outer"><div class="tt-grid" id="ca-kita"></div></div>
+          <div class="tt-note">※授業の最後5分は家庭学習の整理や片付けの時間となります。</div>
+        </div>
+      </div>
+      <button class="accordion-btn" onclick="toggleAcc(this, 'ca-keikyu')">
+        💻 コードアドベンチャー　京急久里浜校　時間割 <span class="acc-arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="tt-wrap">
+          <div class="tt-outer"><div class="tt-grid" id="ca-keikyu"></div></div>
+          <div class="tt-note">※授業の最後5分は家庭学習の整理や片付けの時間となります。</div>
+        </div>
+      </div>
+
+      <div id="fileListHogo"></div>
     </div>
 
-    <!-- 塾タブ -->
-    <div class="tab-panel" id="panelJuku">
+    <!-- 生徒向けタブ -->
+    <div class="tab-panel" id="panelSeito">
       <div class="notice-box">
-        進学塾クロフネに関するご案内・資料を掲載しています。<br>
-        ご不明な点は公式LINEよりお問い合わせください。
+        勉強の進め方・プリントなど生徒向けの資料を掲載しています。<br>
+        ご不明な点は先生に聞いてみてください。
       </div>
-      <div id="fileListJuku"></div>
-    </div>
-
-    <!-- コードアドベンチャータブ -->
-    <div class="tab-panel" id="panelCa">
-      <div class="notice-box">
-        コードアドベンチャーに関するご案内・資料を掲載しています。<br>
-        ご不明な点は公式LINEよりお問い合わせください。
-      </div>
-      <div id="fileListCa"></div>
+      <div id="fileListSeito"></div>
     </div>
 
   </div>
@@ -388,6 +523,109 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Meiryo'
 </div>
 
 <script>
+// ========== 時間割グリッド ==========
+var TT_START = 16, TT_END = 22, CA_START = 15, CA_END = 19, HOUR_PX = 120;
+var TT_DAYS = ['月','火','水','木','金','土'];
+var TT_DATA = {
+  'juku-keikyu': [
+    { day:0, start:'16:20', end:'17:10', grade:'小2〜4年生',       type:'sho' },
+    { day:0, start:'17:15', end:'18:35', grade:'小5,6年生・中学生', type:'mix' },
+    { day:0, start:'18:40', end:'20:00', grade:'中学生',            type:'chu' },
+    { day:0, start:'20:05', end:'21:25', grade:'中学生',            type:'chu' },
+    { day:2, start:'16:20', end:'17:10', grade:'小2〜4年生',       type:'sho' },
+    { day:2, start:'17:15', end:'18:35', grade:'小5,6年生・中学生', type:'mix' },
+    { day:2, start:'18:40', end:'20:00', grade:'中学生',            type:'chu' },
+    { day:2, start:'20:05', end:'21:25', grade:'中学生',            type:'chu' },
+    { day:4, start:'16:20', end:'17:10', grade:'小2〜4年生',       type:'sho' },
+    { day:4, start:'17:15', end:'18:35', grade:'小5,6年生・中学生', type:'mix' },
+    { day:4, start:'18:40', end:'20:00', grade:'中学生',            type:'chu' },
+    { day:4, start:'20:05', end:'21:25', grade:'中学生',            type:'chu' },
+    { day:5, start:'16:20', end:'17:10', name:'英検対策講座',       type:'eiken' },
+    { day:5, start:'17:15', end:'18:35', name:'土曜演習回', grade:'中学生', type:'ens' },
+    { day:5, start:'18:40', end:'20:00', name:'土曜演習回', grade:'中学生', type:'ens',   split:{index:0,total:2} },
+    { day:5, start:'19:00', end:'21:30', name:'受験特訓講座', grade:'中3生', type:'tokku', split:{index:1,total:2} },
+  ],
+  'juku-kita': [
+    { day:1, start:'16:20', end:'17:10', grade:'小2〜4年生',       type:'sho' },
+    { day:1, start:'17:15', end:'18:35', grade:'小5,6年生・中学生', type:'mix' },
+    { day:1, start:'18:40', end:'20:00', grade:'中学生',            type:'chu' },
+    { day:1, start:'20:05', end:'21:25', grade:'中学生',            type:'chu' },
+    { day:3, start:'16:20', end:'17:10', grade:'小2〜4年生',       type:'sho' },
+    { day:3, start:'17:15', end:'18:35', grade:'小5,6年生・中学生', type:'mix' },
+    { day:3, start:'18:40', end:'20:00', grade:'中学生',            type:'chu' },
+    { day:3, start:'20:05', end:'21:25', grade:'中学生',            type:'chu' },
+    { day:4, start:'16:20', end:'17:10', grade:'小2〜4年生',       type:'sho' },
+    { day:4, start:'17:15', end:'18:35', grade:'小5,6年生・中学生', type:'mix' },
+    { day:4, start:'18:40', end:'20:00', grade:'中学生',            type:'chu' },
+    { day:4, start:'20:05', end:'21:25', grade:'中学生',            type:'chu' },
+    { day:5, start:'16:20', end:'17:10', name:'英検対策講座',       type:'eiken' },
+    { day:5, start:'17:15', end:'18:35', name:'土曜演習回', grade:'中学生', type:'ens' },
+    { day:5, start:'18:40', end:'20:00', name:'土曜演習回', grade:'中学生', type:'ens',   split:{index:0,total:2} },
+    { day:5, start:'19:00', end:'21:30', name:'受験特訓講座', grade:'中3生', type:'tokku', split:{index:1,total:2} },
+  ],
+  'ca-keikyu': [
+    { day:1, start:'16:30', end:'17:20', type:'ca' },
+    { day:1, start:'17:30', end:'18:20', type:'ca' },
+    { day:2, start:'16:20', end:'17:10', type:'ca' },
+    { day:4, start:'16:20', end:'17:10', type:'ca' },
+    { day:5, start:'15:20', end:'16:10', type:'ca' },
+  ],
+  'ca-kita': [
+    { day:0, start:'16:30', end:'17:20', type:'ca' },
+    { day:0, start:'17:30', end:'18:20', type:'ca' },
+    { day:3, start:'16:20', end:'17:10', type:'ca' },
+    { day:4, start:'16:20', end:'17:10', type:'ca' },
+    { day:5, start:'15:20', end:'16:10', type:'ca' },
+  ],
+};
+function ttToMin(t){ var p=t.split(':'); return parseInt(p[0])*60+parseInt(p[1]); }
+function ttDur(s,e){ return '（'+(ttToMin(e)-ttToMin(s))+'分）'; }
+function ttClass(type){ return {sho:'s-sho',mix:'s-mix',chu:'s-chu',ens:'s-ens',eiken:'s-eiken',tokku:'s-tokku',ca:'s-ca'}[type]||'s-chu'; }
+function buildTT(id, sh, eh) {
+  var el = document.getElementById(id); if(!el) return;
+  var slots = TT_DATA[id]||[], hours = eh-sh;
+  var corner = document.createElement('div');
+  corner.className='hd-day'; corner.style.cssText='grid-column:1;grid-row:1;';
+  el.appendChild(corner);
+  TT_DAYS.forEach(function(d,i){
+    var h=document.createElement('div'); h.className='hd-day';
+    h.style.cssText='grid-column:'+(i+2)+';grid-row:1;'; h.textContent=d; el.appendChild(h);
+  });
+  for(var h=0;h<hours;h++){
+    var row=h+2;
+    var lbl=document.createElement('div'); lbl.className='time-label';
+    lbl.style.cssText='grid-column:1;grid-row:'+row+';'; lbl.textContent=(sh+h)+':00'; el.appendChild(lbl);
+    for(var c=0;c<6;c++){
+      var lane=document.createElement('div'); lane.className='day-lane';
+      lane.style.cssText='grid-column:'+(c+2)+';grid-row:'+row+';position:relative;'; el.appendChild(lane);
+    }
+  }
+  var lanes={};
+  el.querySelectorAll('.day-lane').forEach(function(e){
+    lanes[e.style.gridColumn+'-'+e.style.gridRow]=e;
+  });
+  slots.forEach(function(s){
+    var sm=ttToMin(s.start), em=ttToMin(s.end), sh2=Math.floor(sm/60);
+    var lane=lanes[(s.day+2)+'-'+(sh2-sh+2)]; if(!lane) return;
+    var card=document.createElement('div');
+    card.className='slot '+ttClass(s.type);
+    card.style.top=((sm-sh2*60)/60*HOUR_PX)+'px';
+    card.style.height=((em-sm)/60*HOUR_PX)+'px';
+    if(s.split){
+      var pct=100/s.split.total;
+      card.style.left='calc('+(pct*s.split.index)+'% + 2px)';
+      card.style.right='calc('+(pct*(s.split.total-s.split.index-1))+'% + 2px)';
+      card.style.width='auto';
+    }
+    var html='<span class="slot-time">'+s.start+'〜'+s.end+'</span>';
+    html+='<span class="slot-dur">'+ttDur(s.start,s.end)+'</span>';
+    if(s.name) html+='<span class="slot-name">'+s.name+'</span>';
+    if(s.grade) html+='<span class="slot-grade">'+s.grade+'</span>';
+    card.innerHTML=html; lane.appendChild(card);
+  });
+  el.style.gridTemplateRows='auto '+Array(hours).fill(HOUR_PX+'px').join(' ');
+}
+
 // ========== パスワード認証 ==========
 var PASSWORD = 'kurofune001';
 
@@ -404,10 +642,24 @@ function checkPassword() {
   }
 }
 
+var ttBuilt = {};
 function showMain() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('mainContent').style.display = 'block';
   renderFiles();
+}
+
+function toggleAcc(btn, gridId) {
+  var body = btn.nextElementSibling;
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+  // 初回オープン時にそのグリッドだけ描画
+  if (!isOpen && gridId && !ttBuilt[gridId]) {
+    var isCA = gridId.indexOf('ca-') === 0;
+    buildTT(gridId, isCA ? CA_START : TT_START, isCA ? CA_END : TT_END);
+    ttBuilt[gridId] = true;
+  }
 }
 
 function logout() {
@@ -421,81 +673,36 @@ function logout() {
 // download: false → 「開く」のみ（ダウンロード制限）
 var FILES = {
 
-  // ---- 共通（塾・CA両方に関係するもの） ----
-  kyotsuu: [
+  // ---- 保護者向け ----
+  hogo: [
     {
-      category: '月謝・引き落とし',
-      desc: '月謝・諸費用・引き落とし日などについてまとめています。',
+      category: '規約類',
+      desc: '入会ガイド・コース案内・各種規約などの資料です。',
       files: [
-        // { name: '月謝・費用案内', desc: '引き落とし日・金額一覧', date: '2026-05-01', path: 'pdf/kyotsuu/gessya.pdf', download: true },
+        { name: '入会ガイドブック',    desc: '入会時の説明資料',                       date: '2026-02-19', path: 'pdf/hogo/nyukai-guide.pdf',    download: true },
+        { name: '中学生コース案内',    desc: '中学生コース・理社演習回・テスト対策・受験特訓', date: '2025-11-04', path: 'pdf/hogo/chugaku-course.pdf', download: true },
+        { name: '受験特訓コース案内',  desc: '受験特訓コースの詳細',                     date: '2026-04-24', path: 'pdf/hogo/jyuken-tokkun.pdf',  download: true },
       ]
     },
-    {
-      category: 'よくある質問',
-      desc: '欠席・振替・連絡方法など共通のよくある質問をまとめています。',
-      files: [
-        // { name: 'よくある質問', desc: '', date: '2026-05-01', path: 'pdf/kyotsuu/faq.pdf', download: true },
-      ]
-    }
   ],
 
-  // ---- 塾（進学塾クロフネ） ----
-  juku: [
+  // ---- 生徒向け ----
+  seito: [
     {
-      category: '通塾ルール・各種手続き',
-      desc: '欠席・振替、授業時間、持ち物などについてまとめています。',
+      category: '勉強に関すること',
+      desc: '家庭学習の進め方・勉強法・プリントなどの資料です。',
       files: [
-        // { name: '通塾ルール', desc: '欠席・振替・持ち物について', date: '2026-05-01', path: 'pdf/juku/rules.pdf', download: true },
+        // { name: '家庭学習ガイド', desc: '', date: '2026-05-01', path: 'pdf/seito/study-guide.pdf', download: true },
       ]
     },
-    {
-      category: '学習の進め方',
-      desc: '宿題、問題集、解き直し、英単語暗記、テスト前の勉強法についてまとめています。',
-      files: [
-        // { name: '家庭学習ガイド', desc: '宿題・解き直し・暗記の進め方', date: '2026-05-01', path: 'pdf/juku/study-guide.pdf', download: true },
-      ]
-    },
-    {
-      category: '演習プリント・教材',
-      desc: '授業や家庭学習で使用するプリントを掲載しています。',
-      files: [
-        // { name: '英単語リスト①', desc: '中1英単語 Unit1-5', date: '2026-05-01', path: 'pdf/juku/tango-01.pdf', download: true },
-      ]
-    }
-  ],
-
-  // ---- コードアドベンチャー ----
-  ca: [
-    {
-      category: '受講ルール・各種手続き',
-      desc: '欠席・振替、持ち物、注意事項などについてまとめています。',
-      files: [
-        // { name: 'コードアドベンチャー受講ルール', desc: '', date: '2026-05-01', path: 'pdf/ca/ca-rules.pdf', download: true },
-      ]
-    },
-    {
-      category: 'カリキュラム・学習内容',
-      desc: 'ステージ一覧・学習内容の概要を掲載しています。',
-      files: [
-        // { name: 'ステージ一覧', desc: 'Stage1〜30の学習内容', date: '2026-05-01', path: 'pdf/ca/stages.pdf', download: true },
-      ]
-    },
-    {
-      category: 'ご家庭向け資料',
-      desc: '保護者の方向けのご案内資料を掲載しています。',
-      files: [
-        // { name: '保護者向け案内', desc: '', date: '2026-05-01', path: 'pdf/ca/for-parents.pdf', download: true },
-      ]
-    }
   ]
 
 };
 
 // ========== ファイル描画 ==========
 function renderFiles() {
-  renderTab('kyotsuu', 'fileListKyotsuu');
-  renderTab('juku', 'fileListJuku');
-  renderTab('ca', 'fileListCa');
+  renderTab('hogo', 'fileListHogo');
+  renderTab('seito', 'fileListSeito');
 }
 
 function renderTab(key, containerId) {
@@ -539,7 +746,7 @@ function esc(str) {
 
 // ========== タブ切り替え ==========
 function switchTab(tab) {
-  ['kyotsuu','juku','ca'].forEach(function(t) {
+  ['hogo','seito'].forEach(function(t) {
     var cap = t.charAt(0).toUpperCase() + t.slice(1);
     document.getElementById('panel' + cap).classList.toggle('active', t === tab);
     document.getElementById('tabBtn' + cap).classList.toggle('active', t === tab);
